@@ -585,6 +585,7 @@ window.firebaseDB = firebase.database();
   var PER_NUMBER_LIMIT = 300000;
   var DAILY_AMOUNT = 50000;
   var data = loadData();
+  var firebaseLoaded = false;
 
   function byId(id){ return document.getElementById(id); }
 
@@ -599,10 +600,13 @@ window.firebaseDB = firebase.database();
   }
 
   function saveData(){
-    if(window.firebaseDB){
-      window.firebaseDB.ref("appData").set(data).catch(function(err){ toast("Firebase error"); console.log(err); });
-    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    if(window.firebaseDB && firebaseLoaded){
+      window.firebaseDB.ref("appData").set(data).catch(function(err){
+        console.log(err);
+        toast("Firebase error");
+      });
+    }
   }
 
   function money(value){
@@ -927,11 +931,14 @@ window.firebaseDB = firebase.database();
   if(window.firebaseDB){
     window.firebaseDB.ref("appData").on("value", function(snapshot){
       var cloudData = snapshot.val();
+
       if(cloudData && Array.isArray(cloudData.blocks)){
         data = cloudData;
         data.blocks.forEach(normalizeBlock);
-        render();
       }
+
+      firebaseLoaded = true;
+      render();
     });
   }
 
