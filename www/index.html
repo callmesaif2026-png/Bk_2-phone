@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bkash Personal List</title>
+<title>Bkash Personal List V17</title>
 <style>
 :root{
   --bg:#f3f7fa;
@@ -507,21 +507,32 @@ button{cursor:pointer}
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyArqkSz90owhkBWOiVWWfPyH5qaL95J9ko",
-  authDomain: "bk-list-af139.firebaseapp.com",
-  databaseURL: "https://bk-list-af139-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "bk-list-af139",
-  storageBucket: "bk-list-af139.firebasestorage.app",
-  messagingSenderId: "408830466247",
-  appId: "1:408830466247:web:883d2ec5d557ddcfd306e2",
-  measurementId: "G-QRWT17MSVG"
-};
+window.firebaseDB = null;
+window.firebaseInitError = null;
 
-firebase.initializeApp(firebaseConfig);
-window.firebaseDB = firebase.database();
+try {
+  var firebaseConfig = {
+    apiKey: "AIzaSyArqkSz90owhkBWOiVWWfPyH5qaL95J9ko",
+    authDomain: "bk-list-af139.firebaseapp.com",
+    databaseURL: "https://bk-list-af139-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "bk-list-af139",
+    storageBucket: "bk-list-af139.firebasestorage.app",
+    messagingSenderId: "408830466247",
+    appId: "1:408830466247:web:883d2ec5d557ddcfd306e2",
+    measurementId: "G-QRWT17MSVG"
+  };
+
+  if (window.firebase && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  if (window.firebase) {
+    window.firebaseDB = firebase.database();
+  }
+} catch (error) {
+  window.firebaseInitError = error;
+  console.error("Firebase initialization failed:", error);
+}
 </script>
 
 
@@ -581,32 +592,74 @@ window.firebaseDB = firebase.database();
 (function(){
   "use strict";
 
-  var STORAGE_KEY = "bks_manager_v4";
+  var STORAGE_KEY = "bks_manager_v17";
+  var FIREBASE_PATH = "appDataJson";
   var PER_NUMBER_LIMIT = 300000;
   var DAILY_AMOUNT = 50000;
-  var data = loadData();
-  var firebaseLoaded = false;
 
-  function byId(id){ return document.getElementById(id); }
+  var data = loadLocalData();
+  var cloudReady = false;
+  var suppressCloudWrite = false;
 
-  function loadData(){
-    try{
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return {blocks:[]};
-      var parsed = JSON.parse(raw);
-      if(parsed && Array.isArray(parsed.blocks)) return parsed;
-    }catch(e){}
+  function byId(id){
+    return document.getElementById(id);
+  }
+
+  function emptyData(){
     return {blocks:[]};
   }
 
-  function saveData(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    if(window.firebaseDB && firebaseLoaded){
-      window.firebaseDB.ref("appData").set(data).catch(function(err){
-        console.log(err);
-        toast("Firebase error");
-      });
+  function cleanData(value){
+    if(!value || typeof value !== "object") return emptyData();
+    if(!Array.isArray(value.blocks)) value.blocks = [];
+
+    value.blocks = value.blocks.filter(function(block){
+      return block && Array.isArray(block.numbers);
+    });
+
+    value.blocks.forEach(normalizeBlock);
+    return value;
+  }
+
+  function loadLocalData(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return emptyData();
+      return cleanData(JSON.parse(raw));
+    }catch(error){
+      console.error("Local data read failed:", error);
+      return emptyData();
     }
+  }
+
+  function saveLocalData(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }catch(error){
+      console.error("Local data save failed:", error);
+    }
+  }
+
+  function saveData(showMessage){
+    data = cleanData(data);
+    saveLocalData();
+    render();
+
+    if(!window.firebaseDB || !cloudReady || suppressCloudWrite){
+      if(showMessage && !window.firebaseDB){
+        toast("Offline save হয়েছে");
+      }
+      return Promise.resolve();
+    }
+
+    return window.firebaseDB.ref(FIREBASE_PATH).set(JSON.stringify(data))
+      .then(function(){
+        if(showMessage) toast("Save হয়েছে");
+      })
+      .catch(function(error){
+        console.error("Firebase write failed:", error);
+        toast("Cloud save হয়নি, local save হয়েছে");
+      });
   }
 
   function money(value){
@@ -616,108 +669,231 @@ window.firebaseDB = firebase.database();
   function todayInfo(){
     var d = new Date();
     return {
-      full:d.toISOString().slice(0,10),
-      day:String(d.getDate())
+      full: d.getFullYear() + "-" +
+        String(d.getMonth()+1).padStart(2,"0") + "-" +
+        String(d.getDate()).padStart(2,"0"),
+      day: String(d.getDate())
     };
-  }
-
-  function emojiNumber(n){
-    var list=["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
-    return list[n-1] || (n+"️⃣");
   }
 
   function toast(message){
     var t = byId("toast");
+    if(!t) return;
     t.textContent = message;
     t.classList.remove("hidden");
     clearTimeout(toast.timer);
-    toast.timer=setTimeout(function(){t.classList.add("hidden");},1700);
+    toast.timer = setTimeout(function(){
+      t.classList.add("hidden");
+    }, 1800);
+  }
+
+  function newMarks(numberCount){
+    var rows = [];
+    for(var i=0;i<numberCount;i++){
+      rows.push([null,null,null,null,null,null]);
+    }
+    return rows;
+  }
+
+  function normalizeMark(mark){
+    if(!mark) return null;
+    if(typeof mark === "object" && mark.full){
+      return {
+        full: String(mark.full),
+        day: String(mark.day || "")
+      };
+    }
+    return null;
   }
 
   function normalizeBlock(block){
-    if(typeof block.limitMode !== "boolean") block.limitMode=false;
+    block.id = String(block.id || (Date.now() + Math.random()));
+    block.numbers = Array.isArray(block.numbers)
+      ? block.numbers.map(function(n){ return String(n); })
+      : [];
+    block.limitMode = block.limitMode === true;
 
     if(!Array.isArray(block.marks)){
-      block.marks = block.numbers.map(function(){
-        return [null,null,null,null,null,null];
-      });
-
-      if(Array.isArray(block.days)){
-        block.days.forEach(function(used,dayIndex){
-          if(used){
-            var info=todayInfo();
-            block.marks.forEach(function(row){ row[dayIndex]=info; });
-          }
-        });
-      }
+      block.marks = newMarks(block.numbers.length);
     }
 
     while(block.marks.length < block.numbers.length){
       block.marks.push([null,null,null,null,null,null]);
     }
+
+    block.marks = block.marks.slice(0, block.numbers.length).map(function(row){
+      if(!Array.isArray(row)) row = [];
+      var fixed = [];
+      for(var i=0;i<6;i++) fixed.push(normalizeMark(row[i]));
+      return fixed;
+    });
   }
 
-  data.blocks.forEach(normalizeBlock);
-
   function getUsedCount(block){
-    var count=0;
+    var count = 0;
     block.marks.forEach(function(row){
-      row.forEach(function(mark){ if(mark) count++; });
+      row.forEach(function(mark){
+        if(mark) count++;
+      });
     });
     return count;
   }
 
   function latestDate(block){
-    var latest=null;
+    var latest = null;
     block.marks.forEach(function(row){
       row.forEach(function(mark){
-        if(mark && mark.full && (!latest || mark.full > latest.full)) latest=mark;
+        if(mark && mark.full && (!latest || mark.full > latest.full)){
+          latest = mark;
+        }
       });
     });
-    return latest ? latest.day+" তারিখ" : "";
+    return latest ? latest.day + " তারিখ" : "";
   }
 
-  function dayState(block,dayIndex){
-    var marked=0;
-    var dateText="";
+  function dayState(block, dayIndex){
+    var marked = 0;
+    var dateText = "";
+
     block.marks.forEach(function(row){
       if(row[dayIndex]){
         marked++;
-        dateText=row[dayIndex].day;
+        dateText = row[dayIndex].day || "";
       }
     });
 
-    if(marked===0) return {className:"",date:""};
-    if(marked===block.numbers.length) return {className:"used",date:dateText};
-    return {className:"partial",date:dateText};
+    if(marked === 0) return {className:"", date:""};
+    if(marked === block.numbers.length) return {className:"used", date:dateText};
+    return {className:"partial", date:dateText};
+  }
+
+  function blockProgress(block){
+    var totalSlots = block.numbers.length * 6;
+    var used = getUsedCount(block);
+    var percent = totalSlots ? Math.round((used / totalSlots) * 100) : 0;
+    var color = "white";
+
+    if(percent > 0 && percent < 50) color = "green";
+    else if(percent >= 50 && percent < 84) color = "yellow";
+    else if(percent >= 84) color = "red";
+
+    return {percent:percent, color:color};
+  }
+
+  function render(){
+    data = cleanData(data);
+
+    var container = byId("blocks");
+    if(!container) return;
+    container.innerHTML = "";
+
+    var totalNumbers = 0;
+    var totalUsedMarks = 0;
+
+    data.blocks.forEach(function(block, index){
+      var progress = blockProgress(block);
+      totalNumbers += block.numbers.length;
+      totalUsedMarks += getUsedCount(block);
+
+      var numbersHtml = block.numbers.map(function(number, numberIndex){
+        var usedForNumber = block.marks[numberIndex].filter(Boolean).length;
+        var miniButtons = "";
+
+        if(block.limitMode){
+          miniButtons = '<div class="number-limits">' +
+            block.marks[numberIndex].map(function(mark, dayIndex){
+              return '<button type="button" class="mini-day ' + (mark ? "used" : "") + '" ' +
+                'data-action="number-day" data-id="' + block.id + '" ' +
+                'data-number="' + numberIndex + '" data-day="' + dayIndex + '">' +
+                (dayIndex + 1) +
+              '</button>';
+            }).join("") +
+          '</div>';
+        }
+
+        return '<div class="number-row">' +
+          '<div class="number-main">' +
+            '<div class="phone">' + number + '</div>' +
+            (block.limitMode
+              ? miniButtons
+              : '<div class="number-used">' + usedForNumber + '/6</div>') +
+          '</div>' +
+        '</div>';
+      }).join("");
+
+      var dayButtons = "";
+      for(var d=0; d<6; d++){
+        var state = dayState(block, d);
+        dayButtons += '<button type="button" class="day ' + state.className + '" ' +
+          'data-action="block-day" data-id="' + block.id + '" data-day="' + d + '">' +
+          (d + 1) +
+          (state.date ? '<small>' + state.date + '</small>' : '') +
+        '</button>';
+      }
+
+      var div = document.createElement("div");
+      div.className = "block";
+      div.innerHTML =
+        '<div class="block-top">' +
+          '<div class="block-name">' +
+            '<span class="block-progress-circle ' + progress.color + '">' +
+              '<span class="serial">' + (index + 1) + '</span>' +
+              '<span class="percent">' + progress.percent + '%</span>' +
+            '</span>' +
+            '<span class="block-date">' + latestDate(block) + '</span>' +
+          '</div>' +
+          '<div class="actions">' +
+            '<button type="button" class="action-btn ' +
+              (block.limitMode ? 'limit-active' : '') +
+              '" data-action="limit" data-id="' + block.id + '">Limit</button>' +
+            '<button type="button" class="action-btn" data-action="copy" data-id="' +
+              block.id + '">Copy</button>' +
+            '<button type="button" class="action-btn delete" data-action="delete" data-id="' +
+              block.id + '">Delete</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="numbers">' + numbersHtml + '</div>' +
+        '<div class="days">' + dayButtons + '</div>';
+
+      container.appendChild(div);
+    });
+
+    var totalLimit = totalNumbers * PER_NUMBER_LIMIT;
+    var remaining = Math.max(totalLimit - (totalUsedMarks * DAILY_AMOUNT), 0);
+
+    byId("totalNumbers").textContent = totalNumbers;
+    byId("totalLimit").textContent = "৳" + money(totalLimit);
+    byId("remainingLimit").textContent = "৳" + money(remaining);
+    byId("empty").style.display = data.blocks.length ? "none" : "block";
   }
 
   function openModal(){
     byId("countStep").classList.remove("hidden");
     byId("numberForm").classList.add("hidden");
-    byId("inputs").innerHTML="";
+    byId("inputs").innerHTML = "";
     byId("modal").classList.remove("hidden");
   }
 
   function closeModal(){
     byId("modal").classList.add("hidden");
-    byId("inputs").innerHTML="";
+    byId("inputs").innerHTML = "";
   }
 
   function makeInputs(){
-    var count=parseInt(byId("blockCount").value,10);
-    if(isNaN(count)||count<1) count=1;
-    if(count>50) count=50;
+    var count = parseInt(byId("blockCount").value, 10);
+    if(isNaN(count) || count < 1) count = 1;
+    if(count > 50) count = 50;
 
-    var wrap=byId("inputs");
-    wrap.innerHTML="";
+    var wrap = byId("inputs");
+    wrap.innerHTML = "";
 
-    for(var i=1;i<=count;i++){
-      var row=document.createElement("div");
-      row.className="input-line";
-      row.innerHTML=
-        '<div class="idx">'+i+'</div>'+
-        '<input class="input phone-input" type="tel" inputmode="numeric" maxlength="11" placeholder="01XXXXXXXXX" required>';
+    for(var i=1; i<=count; i++){
+      var row = document.createElement("div");
+      row.className = "input-line";
+      row.innerHTML =
+        '<div class="idx">' + i + '</div>' +
+        '<input class="input phone-input" type="tel" inputmode="numeric" ' +
+        'maxlength="11" placeholder="01XXXXXXXXX" required>';
       wrap.appendChild(row);
     }
 
@@ -725,202 +901,29 @@ window.firebaseDB = firebase.database();
     byId("numberForm").classList.remove("hidden");
 
     setTimeout(function(){
-      var first=document.querySelector(".phone-input");
+      var first = document.querySelector(".phone-input");
       if(first) first.focus();
-    },40);
+    }, 40);
   }
 
-  function blockProgress(block){
-    var totalSlots=block.numbers.length*6;
-    var used=getUsedCount(block);
-    var percent=totalSlots ? Math.round((used/totalSlots)*100) : 0;
-    var color="white";
-    if(percent>0 && percent<50) color="green";
-    else if(percent>=50 && percent<84) color="yellow";
-    else if(percent>=84) color="red";
-    return {percent:percent,color:color};
+  function toggleMark(block, numberIndex, dayIndex){
+    block.marks[numberIndex][dayIndex] =
+      block.marks[numberIndex][dayIndex] ? null : todayInfo();
   }
 
-  function render(){
-    var container=byId("blocks");
-    container.innerHTML="";
-
-    var totalNumbers=0;
-    var totalUsedMarks=0;
-
-    data.blocks.forEach(function(block,index){
-      normalizeBlock(block);
-      var progress=blockProgress(block);
-
-      totalNumbers+=block.numbers.length;
-      totalUsedMarks+=getUsedCount(block);
-
-      var numbersHtml=block.numbers.map(function(number,numberIndex){
-        var usedForNumber=block.marks[numberIndex].filter(Boolean).length;
-
-        var miniButtons="";
-        if(block.limitMode){
-          miniButtons='<div class="number-limits">'+
-            block.marks[numberIndex].map(function(mark,dayIndex){
-              return '<button type="button" class="mini-day '+(mark?'used':'')+'" '+
-                'data-action="number-day" data-id="'+block.id+'" data-number="'+numberIndex+'" data-day="'+dayIndex+'">'+
-                (dayIndex+1)+(mark?'<small>'+mark.day+'</small>':'')+
-              '</button>';
-            }).join("")+
-          '</div>';
-        }
-
-        return '<div class="number-row">'+
-          '<div class="number-main">'+
-            '<div class="phone">'+number+'</div>'+
-            (block.limitMode ? miniButtons : '<div class="number-used">'+usedForNumber+'/6</div>')+
-          '</div>'+
-        '</div>';
-      }).join("");
-
-      var dayButtons="";
-      for(var d=0;d<6;d++){
-        var state=dayState(block,d);
-        dayButtons+='<button type="button" class="day '+state.className+'" data-action="block-day" data-id="'+block.id+'" data-day="'+d+'">'+
-          (d+1)+(state.date?'<small>'+state.date+'</small>':'')+
-        '</button>';
-      }
-
-      var div=document.createElement("div");
-      div.className="block";
-      div.innerHTML=
-        '<div class="block-top">'+
-          '<div class="block-name">'+
-            '<span class="block-progress-circle '+progress.color+'">'+
-              '<span class="serial">'+(index+1)+'</span>'+
-              '<span class="percent">'+progress.percent+'%</span>'+
-            '</span>'+
-            '<span class="block-date">'+latestDate(block)+'</span>'+
-          '</div>'+
-          '<div class="actions">'+
-            '<button type="button" class="action-btn '+(block.limitMode?'limit-active':'')+'" data-action="limit" data-id="'+block.id+'">Limit</button>'+
-            '<button type="button" class="action-btn" data-action="copy" data-id="'+block.id+'">Copy</button>'+
-            '<button type="button" class="action-btn delete" data-action="delete" data-id="'+block.id+'">Delete</button>'+
-          '</div>'+
-        '</div>'+
-        '<div class="numbers">'+numbersHtml+'</div>'+
-        '<div class="days">'+dayButtons+'</div>';
-
-      container.appendChild(div);
+  function toggleWholeDay(block, dayIndex){
+    var allMarked = block.marks.every(function(row){
+      return !!row[dayIndex];
     });
-
-    var totalLimit=totalNumbers*PER_NUMBER_LIMIT;
-    var remaining=Math.max(totalLimit-(totalUsedMarks*DAILY_AMOUNT),0);
-
-    byId("totalNumbers").textContent=totalNumbers;
-    byId("totalLimit").textContent="৳"+money(totalLimit);
-    byId("remainingLimit").textContent="৳"+money(remaining);
-    byId("empty").style.display=data.blocks.length?"none":"block";
-  }
-
-  function toggleMark(block,numberIndex,dayIndex){
-    if(block.marks[numberIndex][dayIndex]){
-      block.marks[numberIndex][dayIndex]=null;
-    }else{
-      block.marks[numberIndex][dayIndex]=todayInfo();
-    }
-  }
-
-  function toggleWholeDay(block,dayIndex){
-    var allMarked=block.marks.every(function(row){return !!row[dayIndex];});
 
     block.marks.forEach(function(row){
-      row[dayIndex]=allMarked ? null : todayInfo();
+      row[dayIndex] = allMarked ? null : todayInfo();
     });
   }
 
-  byId("addBlockBtn").addEventListener("click",openModal);
-  byId("closeModal").addEventListener("click",closeModal);
-  byId("makeInputsBtn").addEventListener("click",makeInputs);
-
-  byId("modal").addEventListener("click",function(e){
-    if(e.target===byId("modal")) closeModal();
-  });
-
-  byId("numberForm").addEventListener("submit",function(e){
-    e.preventDefault();
-
-    var inputs=Array.prototype.slice.call(document.querySelectorAll(".phone-input"));
-    var numbers=inputs.map(function(input){return input.value.replace(/\D/g,"");});
-
-    if(numbers.some(function(n){return !/^01\d{9}$/.test(n);})){
-      toast("সঠিক ১১ ডিজিটের নাম্বার দিন");
-      return;
-    }
-
-    data.blocks.push({
-      id:String(Date.now())+Math.random().toString(16).slice(2),
-      numbers:numbers,
-      limitMode:false,
-      marks:numbers.map(function(){return [null,null,null,null,null,null];})
-    });
-
-    saveData();
-    render();
-    closeModal();
-    toast("Block added");
-  });
-
-  byId("blocks").addEventListener("click",function(e){
-    var btn=e.target.closest("button[data-action]");
-    if(!btn) return;
-
-    var block=data.blocks.find(function(b){return b.id===btn.dataset.id;});
-    if(!block) return;
-
-    var action=btn.dataset.action;
-
-    if(action==="limit"){
-      block.limitMode=!block.limitMode;
-      saveData();
-      render();
-    }
-
-    if(action==="block-day"){
-      toggleWholeDay(block,parseInt(btn.dataset.day,10));
-      saveData();
-      render();
-    }
-
-    if(action==="number-day"){
-      toggleMark(
-        block,
-        parseInt(btn.dataset.number,10),
-        parseInt(btn.dataset.day,10)
-      );
-      saveData();
-      render();
-    }
-
-    if(action==="copy"){
-      var text=block.numbers.join("\n");
-
-      if(navigator.clipboard&&navigator.clipboard.writeText){
-        navigator.clipboard.writeText(text).then(function(){
-          toast("সব নাম্বার কপি হয়েছে");
-        }).catch(function(){fallbackCopy(text);});
-      }else{
-        fallbackCopy(text);
-      }
-    }
-
-    if(action==="delete"){
-      if(confirm("এই ব্লক ডিলিট করবেন?")){
-        data.blocks=data.blocks.filter(function(b){return b.id!==block.id;});
-        saveData();
-        render();
-      }
-    }
-  });
-
   function fallbackCopy(text){
-    var ta=document.createElement("textarea");
-    ta.value=text;
+    var ta = document.createElement("textarea");
+    ta.value = text;
     document.body.appendChild(ta);
     ta.select();
     document.execCommand("copy");
@@ -928,21 +931,136 @@ window.firebaseDB = firebase.database();
     toast("সব নাম্বার কপি হয়েছে");
   }
 
-  if(window.firebaseDB){
-    window.firebaseDB.ref("appData").on("value", function(snapshot){
-      var cloudData = snapshot.val();
+  byId("addBlockBtn").addEventListener("click", openModal);
+  byId("closeModal").addEventListener("click", closeModal);
+  byId("makeInputsBtn").addEventListener("click", makeInputs);
 
-      if(cloudData && Array.isArray(cloudData.blocks)){
-        data = cloudData;
-        data.blocks.forEach(normalizeBlock);
-      }
+  byId("modal").addEventListener("click", function(event){
+    if(event.target === byId("modal")) closeModal();
+  });
 
-      firebaseLoaded = true;
-      render();
+  byId("numberForm").addEventListener("submit", function(event){
+    event.preventDefault();
+
+    var inputs = Array.prototype.slice.call(
+      document.querySelectorAll(".phone-input")
+    );
+
+    var numbers = inputs.map(function(input){
+      return input.value.replace(/\D/g, "");
     });
-  }
+
+    if(numbers.length === 0 ||
+       numbers.some(function(n){ return !/^01\d{9}$/.test(n); })){
+      toast("সঠিক ১১ ডিজিটের নাম্বার দিন");
+      return;
+    }
+
+    data.blocks.push({
+      id: String(Date.now()) + Math.random().toString(16).slice(2),
+      numbers: numbers,
+      limitMode: false,
+      marks: newMarks(numbers.length)
+    });
+
+    closeModal();
+    saveData(true);
+  });
+
+  byId("blocks").addEventListener("click", function(event){
+    var btn = event.target.closest("button[data-action]");
+    if(!btn) return;
+
+    var block = data.blocks.find(function(item){
+      return item.id === btn.dataset.id;
+    });
+    if(!block) return;
+
+    var action = btn.dataset.action;
+
+    if(action === "limit"){
+      block.limitMode = !block.limitMode;
+      saveData(false);
+      return;
+    }
+
+    if(action === "block-day"){
+      toggleWholeDay(block, parseInt(btn.dataset.day, 10));
+      saveData(false);
+      return;
+    }
+
+    if(action === "number-day"){
+      toggleMark(
+        block,
+        parseInt(btn.dataset.number, 10),
+        parseInt(btn.dataset.day, 10)
+      );
+      saveData(false);
+      return;
+    }
+
+    if(action === "copy"){
+      var text = block.numbers.join("\n");
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text)
+          .then(function(){ toast("সব নাম্বার কপি হয়েছে"); })
+          .catch(function(){ fallbackCopy(text); });
+      }else{
+        fallbackCopy(text);
+      }
+      return;
+    }
+
+    if(action === "delete"){
+      if(confirm("এই ব্লক ডিলিট করবেন?")){
+        data.blocks = data.blocks.filter(function(item){
+          return item.id !== block.id;
+        });
+        saveData(false);
+      }
+    }
+  });
 
   render();
+
+  if(window.firebaseDB){
+    window.firebaseDB.ref(FIREBASE_PATH).on(
+      "value",
+      function(snapshot){
+        cloudReady = true;
+        var raw = snapshot.val();
+
+        if(typeof raw === "string" && raw){
+          try{
+            suppressCloudWrite = true;
+            data = cleanData(JSON.parse(raw));
+            saveLocalData();
+            render();
+          }catch(error){
+            console.error("Cloud JSON parse failed:", error);
+            toast("Cloud data পড়া যায়নি");
+          }finally{
+            suppressCloudWrite = false;
+          }
+        }else{
+          window.firebaseDB.ref(FIREBASE_PATH)
+            .set(JSON.stringify(data))
+            .catch(function(error){
+              console.error("First cloud save failed:", error);
+            });
+        }
+      },
+      function(error){
+        cloudReady = false;
+        console.error("Firebase read failed:", error);
+        toast("Offline mode");
+      }
+    );
+  }else{
+    cloudReady = false;
+    console.error("Firebase SDK unavailable:", window.firebaseInitError);
+  }
 })();
 </script>
 </body>
