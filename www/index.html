@@ -600,7 +600,7 @@ window.firebaseDB = firebase.database();
 
   function saveData(){
     if(window.firebaseDB){
-      window.firebaseDB.ref("appData").set(data);
+      window.firebaseDB.ref("appData").set(data).catch(function(err){ toast("Firebase error"); console.log(err); });
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
@@ -935,7 +935,6 @@ window.firebaseDB = firebase.database();
     });
   }
 
-  saveData();
   render();
 })();
 </script>
