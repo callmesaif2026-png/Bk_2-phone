@@ -3,112 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bkash Personal List V17</title>
+<meta name="theme-color" content="#f7f9fc">
+<title>Bkash Personal List Live Sync</title>
+
 <style>
 :root{
-  --bg:#f3f7fa;
+  --bg:#eef4f7;
   --card:#ffffff;
-  --soft:#f5f9fc;
-  --border:#d9e4eb;
-  --text:#163043;
-  --muted:#728594;
-  --pink:#e91e67;
-  --pink2:#ff4f91;
-  --green:#24b96a;
+  --soft:#f4f8fb;
+  --border:#d7e2e9;
+  --text:#173145;
+  --muted:#718594;
+  --pink:#e81767;
+  --pink2:#ff5594;
+  --green:#28b96b;
+  --yellow:#e8b731;
   --red:#ef5362;
-  --orange:#f2a53b;
-  --shadow:0 8px 22px rgba(44,77,98,.10);
+  --shadow:0 8px 22px rgba(40,76,98,.11);
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
 body{
   margin:0;
-  background:linear-gradient(180deg,#f9fcfe 0%,#eef4f7 100%);
+  background:linear-gradient(180deg,#f9fcfe 0%,var(--bg) 100%);
   color:var(--text);
   font-family:Arial,sans-serif;
 }
-button,input{font:inherit}
+button,input,a{font:inherit}
 button{cursor:pointer}
+a{text-decoration:none}
 .hidden{display:none!important}
 
 .app{
-  max-width:760px;
+  width:min(760px,100%);
   margin:auto;
-  padding:10px 9px 80px;
+  padding:10px 9px 86px;
 }
 
+/* Top menu */
 .title-bar{
-  margin:0 0 10px;
-  padding:12px 14px;
-  border-radius:16px;
-  background:
-    radial-gradient(circle at 90% 10%,rgba(255,255,255,.26),transparent 30%),
-    linear-gradient(135deg,#c91257 0%,#ec1c70 55%,#ff5a98 100%);
-  box-shadow:0 12px 28px rgba(214,20,90,.28);
   display:flex;
   align-items:center;
-  gap:11px;
-  overflow:hidden;
+  justify-content:space-between;
+  gap:10px;
+  padding:11px 12px;
+  margin-bottom:10px;
+  border-radius:15px;
+  background:linear-gradient(135deg,#d9125e,#ff5795);
+  box-shadow:0 10px 24px rgba(232,23,103,.24);
 }
-.title-icon{
-  width:42px;
-  height:42px;
-  flex:0 0 42px;
-  display:grid;
-  place-items:center;
-  border-radius:13px;
-  background:rgba(255,255,255,.18);
-  border:1px solid rgba(255,255,255,.28);
+.menu-btn{
+  width:39px;
+  height:39px;
+  border:1px solid rgba(255,255,255,.36);
+  border-radius:11px;
+  background:rgba(255,255,255,.14);
   color:#fff;
-  font-size:24px;
+  font-size:22px;
   font-weight:900;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.25);
 }
-.title-bar h1{
-  margin:0;
+.notepad-btn{
+  padding:10px 14px;
+  border:1px solid rgba(255,255,255,.38);
+  border-radius:11px;
+  background:rgba(255,255,255,.15);
   color:#fff;
-  font-size:21px;
-  letter-spacing:.2px;
-  line-height:1.1;
-}
-.title-bar p{
-  margin:3px 0 0;
-  color:rgba(255,255,255,.82);
-  font-size:10px;
-  letter-spacing:.2px;
+  font-size:13px;
+  font-weight:800;
 }
 
+/* Summary */
 .summary{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:.76fr 1.18fr 1.18fr;
   gap:6px;
   margin-bottom:9px;
 }
 .sum{
   min-width:0;
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:12px;
+  min-height:91px;
   padding:9px 7px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:var(--card);
   box-shadow:var(--shadow);
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
 }
 .sum span{
   display:block;
+  margin-bottom:6px;
   color:var(--muted);
   font-size:10px;
-  margin-bottom:5px;
 }
 .sum strong{
   display:block;
-  font-size:13px;
-  word-break:break-word;
+  max-width:100%;
+  color:var(--text);
+  font-size:14px;
+  line-height:1.15;
+  white-space:nowrap;
+  letter-spacing:-.3px;
+}
+.donut{
+  --used:0deg;
+  width:70px;
+  height:70px;
+  position:relative;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:conic-gradient(
+    var(--red) 0deg var(--used),
+    #e8eef2 var(--used) 360deg
+  );
+  box-shadow:0 5px 14px rgba(34,67,88,.14);
+}
+.donut::before{
+  content:"";
+  position:absolute;
+  inset:9px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:inset 0 0 0 1px #e4ebef;
+}
+.donut-inner{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  line-height:1;
+}
+.donut-inner strong{
+  font-size:19px;
+  letter-spacing:-.6px;
+}
+.donut-inner small{
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+  font-size:7px;
+  font-weight:800;
 }
 
+/* Blocks */
 .blocks{display:grid;gap:8px}
 .block{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:14px;
   padding:9px;
+  border:1px solid var(--border);
+  border-radius:15px;
+  background:var(--card);
   box-shadow:var(--shadow);
 }
 .block-top{
@@ -118,15 +164,50 @@ button{cursor:pointer}
   gap:7px;
   margin-bottom:7px;
 }
-.block-name{
+.block-head-left{
   display:flex;
   align-items:center;
   gap:7px;
   min-width:0;
 }
-.block-emoji{
-  font-size:20px;
+.block-circle{
+  width:48px;
+  height:48px;
+  flex:0 0 48px;
+  border:2px solid var(--border);
+  border-radius:50%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  color:var(--text);
   line-height:1;
+  transition:.2s;
+}
+.block-circle .serial{
+  font-size:17px;
+  font-weight:900;
+}
+.block-circle .percent{
+  margin-top:3px;
+  font-size:8px;
+  font-weight:900;
+}
+.block-circle.green{
+  border-color:var(--green);
+  background:#e5f7ee;
+  color:#13864a;
+}
+.block-circle.yellow{
+  border-color:var(--yellow);
+  background:#fff5d6;
+  color:#9a730e;
+}
+.block-circle.red{
+  border-color:var(--red);
+  background:#ffe5e8;
+  color:#c22d3c;
 }
 .block-date{
   color:var(--muted);
@@ -135,20 +216,26 @@ button{cursor:pointer}
 }
 .actions{
   display:flex;
-  gap:5px;
+  gap:4px;
+  flex-wrap:nowrap;
 }
 .action-btn{
   border:1px solid var(--border);
+  border-radius:8px;
+  padding:6px 7px;
   background:var(--soft);
   color:var(--text);
-  border-radius:8px;
-  padding:6px 8px;
   font-size:10px;
 }
-.action-btn.limit-active{
-  color:#fff;
+.action-btn.active{
   border-color:var(--pink);
   background:var(--pink);
+  color:#fff;
+}
+.action-btn.amount-active{
+  border-color:var(--green);
+  background:var(--green);
+  color:#fff;
 }
 .action-btn.delete{color:var(--red)}
 
@@ -160,59 +247,59 @@ button{cursor:pointer}
 }
 .number-row{
   min-width:0;
-  background:var(--soft);
-  border:1px solid #e6edf2;
-  border-radius:9px;
   padding:6px 7px;
+  border:1px solid #e4ecf1;
+  border-radius:9px;
+  background:var(--soft);
 }
 .number-main{
   display:flex;
   align-items:center;
-  gap:7px;
-  min-width:0;
+  justify-content:space-between;
+  gap:5px;
 }
 .phone{
-  flex:0 0 auto;
-  font-size:14px;
-  font-weight:800;
-  line-height:1.1;
-  letter-spacing:.25px;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
   white-space:nowrap;
+  color:var(--text);
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:.2px;
 }
 .number-used{
-  margin-left:auto;
+  flex:0 0 auto;
   color:var(--muted);
   font-size:9px;
-  white-space:nowrap;
 }
 .number-limits{
-  margin-left:auto;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:2px;
-  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:3px;
+  margin-top:5px;
 }
 .mini-day{
-  width:22px;
-  height:22px;
-  flex:0 0 22px;
-  border:1px solid rgba(36,185,106,.35);
-  background:rgba(36,185,106,.10);
-  color:#17874d;
+  min-width:0;
+  padding:4px 0 3px;
+  border:1px solid rgba(40,185,107,.36);
   border-radius:6px;
-  padding:0;
+  background:rgba(40,185,107,.10);
+  color:#16874c;
   font-size:9px;
   font-weight:800;
   line-height:1;
 }
 .mini-day.used{
-  border-color:rgba(239,83,98,.40);
+  border-color:rgba(239,83,98,.42);
   background:rgba(239,83,98,.14);
-  color:#c33140;
+  color:#c42e3d;
 }
-.mini-day small{display:none}
-
+.mini-day small{
+  display:block;
+  margin-top:2px;
+  font-size:7px;
+}
 .days{
   display:grid;
   grid-template-columns:repeat(6,1fr);
@@ -220,56 +307,55 @@ button{cursor:pointer}
 }
 .day{
   min-width:0;
-  border:1px solid rgba(36,185,106,.38);
-  background:rgba(36,185,106,.10);
-  color:#17874d;
-  border-radius:8px;
   padding:6px 1px 5px;
+  border:1px solid rgba(40,185,107,.40);
+  border-radius:8px;
+  background:rgba(40,185,107,.10);
+  color:#16874c;
   font-size:12px;
-  font-weight:800;
+  font-weight:900;
   line-height:1;
 }
 .day.partial{
-  border-color:rgba(242,165,59,.48);
-  background:rgba(242,165,59,.14);
-  color:#b87412;
+  border-color:rgba(232,183,49,.52);
+  background:rgba(232,183,49,.14);
+  color:#98700e;
 }
 .day.used{
-  border-color:rgba(239,83,98,.45);
+  border-color:rgba(239,83,98,.46);
   background:rgba(239,83,98,.14);
-  color:#c33140;
+  color:#c42e3d;
 }
 .day small{
   display:block;
   margin-top:3px;
   font-size:8px;
-  line-height:1;
 }
 
 .empty{
-  text-align:center;
-  color:var(--muted);
   padding:28px 10px;
-  background:var(--card);
   border:1px solid var(--border);
   border-radius:14px;
+  background:var(--card);
+  color:var(--muted);
+  text-align:center;
   box-shadow:var(--shadow);
 }
-
 .fab{
   position:fixed;
   right:16px;
   bottom:20px;
-  width:54px;
-  height:54px;
+  width:55px;
+  height:55px;
   border:0;
   border-radius:50%;
   background:linear-gradient(135deg,var(--pink),var(--pink2));
   color:#fff;
-  font-size:30px;
-  box-shadow:0 12px 28px rgba(233,30,103,.32);
+  font-size:31px;
+  box-shadow:0 12px 28px rgba(232,23,103,.33);
 }
 
+/* Modal */
 .modal{
   position:fixed;
   inset:0;
@@ -278,7 +364,7 @@ button{cursor:pointer}
   align-items:flex-end;
   justify-content:center;
   padding:9px;
-  background:rgba(29,49,63,.35);
+  background:rgba(24,44,58,.36);
   backdrop-filter:blur(3px);
 }
 .modal-box{
@@ -286,69 +372,86 @@ button{cursor:pointer}
   max-width:520px;
   max-height:92vh;
   overflow:auto;
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:18px 18px 9px 9px;
   padding:14px;
-  box-shadow:0 20px 45px rgba(33,62,79,.22);
+  border:1px solid var(--border);
+  border-radius:19px 19px 9px 9px;
+  background:var(--card);
+  box-shadow:0 22px 48px rgba(30,57,73,.22);
 }
 .modal-head{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:8px;
   margin-bottom:10px;
 }
-.modal-head h2{margin:0;font-size:18px}
+.modal-head h2{
+  margin:0;
+  font-size:18px;
+}
 .close{
-  width:36px;height:36px;border:0;border-radius:9px;
-  background:var(--soft);color:var(--text)
+  width:37px;
+  height:37px;
+  border:0;
+  border-radius:9px;
+  background:var(--soft);
+  color:var(--text);
 }
 .label{
   display:block;
+  margin:9px 0 5px;
   color:var(--muted);
   font-size:11px;
-  margin:9px 0 5px;
 }
 .input{
   width:100%;
-  height:40px;
+  height:41px;
+  padding:0 10px;
   border:1px solid var(--border);
+  border-radius:9px;
+  outline:none;
   background:#fbfdff;
   color:var(--text);
-  border-radius:9px;
-  padding:0 10px;
-  outline:none;
 }
 .input:focus{
   border-color:var(--pink);
-  box-shadow:0 0 0 3px rgba(233,30,103,.09);
+  box-shadow:0 0 0 3px rgba(232,23,103,.09);
 }
 .inputs{display:grid;gap:6px}
 .input-line{
   display:grid;
   grid-template-columns:34px 1fr;
-  gap:6px;
   align-items:center;
+  gap:6px;
 }
 .idx{
   height:34px;
+  border-radius:8px;
   display:grid;
   place-items:center;
   background:var(--soft);
-  border-radius:8px;
   color:var(--pink);
   font-size:12px;
-  font-weight:800;
+  font-weight:900;
 }
 .full-btn{
   width:100%;
+  margin-top:10px;
+  padding:11px;
   border:0;
   border-radius:9px;
-  padding:11px;
-  margin-top:10px;
   background:linear-gradient(135deg,var(--pink),var(--pink2));
   color:#fff;
-  font-weight:800;
+  font-weight:900;
+}
+.back-btn{
+  width:100%;
+  margin-top:7px;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:var(--soft);
+  color:var(--text);
 }
 .toast{
   position:fixed;
@@ -356,19 +459,26 @@ button{cursor:pointer}
   bottom:22px;
   z-index:40;
   transform:translateX(-50%);
-  background:#173042;
-  color:#fff;
   padding:9px 13px;
   border-radius:9px;
+  background:#173145;
+  color:#fff;
   font-size:12px;
-  font-weight:700;
+  font-weight:800;
+  white-space:nowrap;
 }
+
 @media(max-width:420px){
-  .title-bar h1{font-size:19px}
+  .summary{grid-template-columns:.72fr 1.2fr 1.2fr;gap:5px}
+  .sum{min-height:84px;padding:7px 5px}
+  .sum span{font-size:9px}
   .sum strong{font-size:12px}
-  .numbers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .donut{width:64px;height:64px}
+  .donut::before{inset:8px}
+  .donut-inner strong{font-size:17px}
+  .actions{gap:3px}
+  .action-btn{padding:6px 5px;font-size:9px}
   .phone{font-size:13px}
-  .mini-day{width:20px;height:20px;flex-basis:20px;font-size:8px}
 }
 @media(max-width:340px){
   .numbers{grid-template-columns:1fr}
@@ -376,132 +486,203 @@ button{cursor:pointer}
 </style>
 
 <style>
-/* V7 fixes */
-.block-emoji{
- width:48px!important;
- height:48px!important;
- border-radius:50%!important;
- display:flex!important;
- align-items:center!important;
- justify-content:center!important;
- font-weight:900!important;
+/* ===== V12 updates ===== */
+.block-circle .serial{
+  font-size:20px!important;
+  font-weight:900!important;
+}
+.block-date{
+  font-size:12px!important;
+  font-weight:800!important;
 }
 .phone{
- font-size:16px!important;
- font-weight:900!important;
-}
-</style>
-
-<style>
-/* V8: circular block progress + centered summary */
-.summary .sum{
-  text-align:center!important;
-  display:flex!important;
-  min-height:86px!important;
-  flex-direction:column!important;
-  align-items:center!important;
-  justify-content:center!important;
-}
-.summary .sum span{
-  font-size:13px!important;
-  font-weight:700!important;
-  margin-bottom:7px!important;
-}
-.summary .sum strong{
-  font-size:18px!important;
+  font-size:15px!important;
   font-weight:900!important;
-  line-height:1.12!important;
 }
-.block-progress-circle{
-  width:52px;
-  height:52px;
-  flex:0 0 52px;
-  border-radius:50%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  border:3px solid #dbe4ea;
-  background:#fff;
-  color:#173042;
-  box-shadow:0 5px 13px rgba(31,58,76,.11);
-  line-height:1;
-  transition:.2s ease;
+.action-btn.edit{
+  color:#1769aa!important;
 }
-.block-progress-circle .serial{
-  font-size:20px;
-  font-weight:900;
-}
-.block-progress-circle .percent{
-  margin-top:3px;
-  font-size:8px;
-  font-weight:900;
-}
-.block-progress-circle.white{
-  background:#fff;
-  border-color:#d9e4ea;
-  color:#506575;
-}
-.block-progress-circle.green{
-  background:#e6f7ee;
-  border-color:#2cbd70;
-  color:#158449;
-}
-.block-progress-circle.yellow{
-  background:#fff7d9;
-  border-color:#e2b62f;
-  color:#9b7410;
-}
-.block-progress-circle.red{
-  background:#ffe5e8;
-  border-color:#ef5362;
-  color:#c52d3c;
-}
-.block-name{gap:9px!important}
 @media(max-width:420px){
-  .summary .sum{min-height:80px!important;padding:9px 5px!important}
-  .summary .sum span{font-size:11px!important}
-  .summary .sum strong{font-size:15px!important}
-  .block-progress-circle{width:48px;height:48px;flex-basis:48px}
-  .block-progress-circle .serial{font-size:18px}
+  .block-circle .serial{font-size:18px!important}
+  .phone{font-size:14px!important}
 }
 </style>
 
+
 <style>
-/* V9 top navigation bar */
-.title-bar{
-  justify-content:space-between!important;
-  min-height:58px!important;
-  padding:9px 12px!important;
+/* ===== V13 visual updates ===== */
+.donut{
+  background:conic-gradient(
+    var(--donut-color, var(--green)) 0deg var(--used),
+    #e8eef2 var(--used) 360deg
+  )!important;
 }
-.menu-btn{
-  width:42px;
-  height:42px;
-  border:1px solid rgba(255,255,255,.34);
-  border-radius:12px;
-  background:rgba(255,255,255,.16);
-  color:#fff;
-  font-size:23px;
-  font-weight:900;
-  line-height:1;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
-}
-.notepad-btn{
-  display:inline-flex;
+.donut.green{ --donut-color:var(--green); }
+.donut.yellow{ --donut-color:var(--yellow); }
+.donut.red{ --donut-color:var(--red); }
+
+.donut-inner{
+  display:flex;
   align-items:center;
   justify-content:center;
-  min-height:42px;
-  padding:0 17px;
-  border:1px solid rgba(255,255,255,.38);
-  border-radius:12px;
-  background:#fff;
-  color:#d9145f;
-  font-size:14px;
-  font-weight:900;
-  text-decoration:none;
-  box-shadow:0 6px 15px rgba(109,8,48,.17);
 }
-.notepad-btn:active,.menu-btn:active{transform:scale(.97)}
+.donut-inner strong{
+  font-size:21px!important;
+  font-weight:900!important;
+}
+
+.block-date{display:none!important}
+
+.actions{
+  gap:5px!important;
+}
+.action-btn{
+  min-height:34px;
+  padding:7px 9px!important;
+  border-radius:10px!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  box-shadow:0 3px 8px rgba(35,65,84,.06);
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.action-btn:active{
+  transform:scale(.97);
+}
+.action-btn.edit{
+  color:#1769aa!important;
+  background:#eef6fc!important;
+}
+.action-btn.delete{
+  color:#d33f50!important;
+  background:#fff1f3!important;
+}
+.action-btn.amount-active{
+  background:var(--green)!important;
+  color:#fff!important;
+  border-color:var(--green)!important;
+}
+.action-btn.active{
+  background:var(--pink)!important;
+  color:#fff!important;
+  border-color:var(--pink)!important;
+}
+
+@media(max-width:420px){
+  .action-btn{
+    padding:7px 8px!important;
+    font-size:10px!important;
+  }
+}
+</style>
+
+
+<style>
+/* ===== V14: keep Limit 1-6 buttons beside each number ===== */
+.number-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:7px!important;
+  padding:6px 7px!important;
+}
+
+.number-main{
+  min-width:0!important;
+}
+
+.number-limits{
+  display:grid!important;
+  grid-template-columns:repeat(6,28px)!important;
+  gap:3px!important;
+  margin-top:0!important;
+  flex:0 0 auto!important;
+}
+
+.mini-day{
+  width:28px!important;
+  min-width:28px!important;
+  height:28px!important;
+  padding:0!important;
+  border-radius:7px!important;
+  font-size:9px!important;
+  line-height:1!important;
+}
+
+.mini-day small{
+  margin-top:1px!important;
+  font-size:6px!important;
+}
+
+.phone{
+  font-size:14px!important;
+  font-weight:900!important;
+}
+
+.number-used{
+  display:none!important;
+}
+
+@media(max-width:520px){
+  .number-row{
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:5px!important;
+  }
+
+  .number-limits{
+    grid-template-columns:repeat(6,24px)!important;
+    gap:2px!important;
+  }
+
+  .mini-day{
+    width:24px!important;
+    min-width:24px!important;
+    height:25px!important;
+    font-size:8px!important;
+  }
+
+  .phone{
+    font-size:13px!important;
+  }
+}
+
+@media(max-width:360px){
+  .number-limits{
+    grid-template-columns:repeat(6,22px)!important;
+  }
+
+  .mini-day{
+    width:22px!important;
+    min-width:22px!important;
+    height:23px!important;
+    font-size:8px!important;
+  }
+
+  .phone{
+    font-size:12px!important;
+  }
+}
+</style>
+
+
+<style>
+/* ===== V15: restore larger bold phone-number font ===== */
+.phone{
+  font-size:16px!important;
+  font-weight:900!important;
+  letter-spacing:.3px!important;
+}
+
+@media(max-width:520px){
+  .phone{
+    font-size:15px!important;
+  }
+}
+
+@media(max-width:360px){
+  .phone{
+    font-size:14px!important;
+  }
+}
 </style>
 
 
@@ -510,8 +691,7 @@ button{cursor:pointer}
 <script>
 window.firebaseDB = null;
 window.firebaseInitError = null;
-
-try {
+try{
   var firebaseConfig = {
     apiKey: "AIzaSyArqkSz90owhkBWOiVWWfPyH5qaL95J9ko",
     authDomain: "bk-list-af139.firebaseapp.com",
@@ -522,38 +702,42 @@ try {
     appId: "1:408830466247:web:883d2ec5d557ddcfd306e2",
     measurementId: "G-QRWT17MSVG"
   };
-
-  if (window.firebase && !firebase.apps.length) {
+  if(window.firebase && !firebase.apps.length){
     firebase.initializeApp(firebaseConfig);
   }
-  if (window.firebase) {
+  if(window.firebase){
     window.firebaseDB = firebase.database();
   }
-} catch (error) {
+}catch(error){
   window.firebaseInitError = error;
   console.error("Firebase initialization failed:", error);
 }
 </script>
 
-
 </head>
-<body>
 
+<body>
 <div class="app">
+
   <div class="title-bar">
-    <button class="menu-btn" type="button" aria-label="Menu">☰</button>
+    <button class="menu-btn" type="button" aria-label="Menu">≡</button>
     <a class="notepad-btn" href="notepad.html">Notepad</a>
   </div>
 
   <div class="summary">
     <div class="sum">
-      <span>মোট নাম্বার</span>
-      <strong id="totalNumbers">0</strong>
+      <div class="donut" id="usedDonut">
+        <div class="donut-inner">
+          <strong id="usedPercent">100%</strong>
+        </div>
+      </div>
     </div>
+
     <div class="sum">
-      <span>মোট লিমিট</span>
+      <span id="totalLimitLabel">নাম্বার 0 টি ➤ লিমিট</span>
       <strong id="totalLimit">৳0</strong>
     </div>
+
     <div class="sum">
       <span>বাকি লিমিট</span>
       <strong id="remainingLimit">৳0</strong>
@@ -564,183 +748,213 @@ try {
   <div id="blocks" class="blocks"></div>
 </div>
 
-<button id="addBlockBtn" class="fab" type="button">+</button>
+<button class="fab" id="addBlockBtn" type="button">+</button>
 
-<div id="modal" class="modal hidden">
+<div class="modal hidden" id="modal">
   <div class="modal-box">
     <div class="modal-head">
       <h2>নতুন নাম্বার যোগ করুন</h2>
-      <button class="close" type="button" id="closeModal">✕</button>
+      <button class="close" id="closeModal" type="button">✕</button>
     </div>
 
     <div id="countStep">
-      <label class="label">কয়টি নাম্বার দিবেন?</label>
-      <input class="input" id="blockCount" type="number" min="1" max="50" value="4">
-      <button class="full-btn" type="button" id="makeInputsBtn">Next</button>
+      <label class="label" for="blockCount">কয়টি নাম্বার দিবেন?</label>
+      <input class="input" id="blockCount" type="number" inputmode="numeric" min="1" max="50" value="4">
+      <button class="full-btn" id="makeInputsBtn" type="button">Next</button>
     </div>
 
-    <form id="numberForm" class="hidden">
-      <div id="inputs" class="inputs"></div>
+    <form class="hidden" id="numberForm" novalidate>
+      <input type="hidden" id="editingBlockId" value="">
+      <div class="inputs" id="inputs"></div>
       <button class="full-btn" type="submit">Submit</button>
+      <button class="back-btn" id="backBtn" type="button">পেছনে</button>
     </form>
   </div>
 </div>
 
-<div id="toast" class="toast hidden"></div>
+<div class="toast hidden" id="toast"></div>
 
 <script>
 (function(){
   "use strict";
 
-  var STORAGE_KEY = "bks_manager_v17";
-  var FIREBASE_PATH = "appDataJson";
+  var STORAGE_KEY = "bks_manager_v18";
+  var FIREBASE_PATH = "appDataJsonV18";
   var PER_NUMBER_LIMIT = 300000;
   var DAILY_AMOUNT = 50000;
-
-  var data = loadLocalData();
+  var data = loadData();
   var cloudReady = false;
-  var suppressCloudWrite = false;
+  var applyingCloudData = false;
 
   function byId(id){
     return document.getElementById(id);
   }
 
-  function emptyData(){
-    return {blocks:[]};
+  function newId(){
+    return String(Date.now()) + Math.random().toString(16).slice(2);
   }
 
-  function cleanData(value){
-    if(!value || typeof value !== "object") return emptyData();
-    if(!Array.isArray(value.blocks)) value.blocks = [];
-
-    value.blocks = value.blocks.filter(function(block){
-      return block && Array.isArray(block.numbers);
-    });
-
-    value.blocks.forEach(normalizeBlock);
-    return value;
-  }
-
-  function loadLocalData(){
+  function loadData(){
     try{
       var raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return emptyData();
-      return cleanData(JSON.parse(raw));
+      if(!raw) return {blocks:[]};
+
+      var parsed = JSON.parse(raw);
+      if(parsed && Array.isArray(parsed.blocks)){
+        return parsed;
+      }
     }catch(error){
-      console.error("Local data read failed:", error);
-      return emptyData();
+      console.error(error);
     }
+    return {blocks:[]};
   }
 
   function saveLocalData(){
     try{
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }catch(error){
-      console.error("Local data save failed:", error);
+      console.error("Local save failed:", error);
     }
   }
 
-  function saveData(showMessage){
-    data = cleanData(data);
+  function saveData(){
     saveLocalData();
-    render();
 
-    if(!window.firebaseDB || !cloudReady || suppressCloudWrite){
-      if(showMessage && !window.firebaseDB){
-        toast("Offline save হয়েছে");
-      }
-      return Promise.resolve();
+    if(window.firebaseDB && cloudReady && !applyingCloudData){
+      window.firebaseDB.ref(FIREBASE_PATH).set(JSON.stringify(data))
+        .catch(function(error){
+          console.error("Firebase save failed:", error);
+          toast("Cloud save হয়নি, ফোনে save হয়েছে");
+        });
     }
-
-    return window.firebaseDB.ref(FIREBASE_PATH).set(JSON.stringify(data))
-      .then(function(){
-        if(showMessage) toast("Save হয়েছে");
-      })
-      .catch(function(error){
-        console.error("Firebase write failed:", error);
-        toast("Cloud save হয়নি, local save হয়েছে");
-      });
   }
 
-  function money(value){
-    return new Intl.NumberFormat("en-IN").format(value);
+  function normalizePhone(value){
+    return String(value || "").replace(/\D/g,"");
   }
 
-  function todayInfo(){
+  function validPhone(value){
+    return /^01\d{9}$/.test(value);
+  }
+
+  function formatMoney(value){
+    return new Intl.NumberFormat("en-IN").format(Number(value || 0));
+  }
+
+  function todayMark(){
     var d = new Date();
+    var year = d.getFullYear();
+    var month = String(d.getMonth()+1).padStart(2,"0");
+    var day = String(d.getDate()).padStart(2,"0");
+
     return {
-      full: d.getFullYear() + "-" +
-        String(d.getMonth()+1).padStart(2,"0") + "-" +
-        String(d.getDate()).padStart(2,"0"),
-      day: String(d.getDate())
+      full:year+"-"+month+"-"+day,
+      day:String(d.getDate())
     };
   }
 
-  function toast(message){
-    var t = byId("toast");
-    if(!t) return;
-    t.textContent = message;
-    t.classList.remove("hidden");
-    clearTimeout(toast.timer);
-    toast.timer = setTimeout(function(){
-      t.classList.add("hidden");
-    }, 1800);
-  }
-
-  function newMarks(numberCount){
-    var rows = [];
-    for(var i=0;i<numberCount;i++){
-      rows.push([null,null,null,null,null,null]);
-    }
-    return rows;
-  }
-
-  function normalizeMark(mark){
-    if(!mark) return null;
-    if(typeof mark === "object" && mark.full){
-      return {
-        full: String(mark.full),
-        day: String(mark.day || "")
-      };
-    }
-    return null;
-  }
-
   function normalizeBlock(block){
-    block.id = String(block.id || (Date.now() + Math.random()));
-    block.numbers = Array.isArray(block.numbers)
-      ? block.numbers.map(function(n){ return String(n); })
-      : [];
-    block.limitMode = block.limitMode === true;
+    if(!Array.isArray(block.numbers)){
+      block.numbers = [];
+    }
+
+    if(typeof block.limitMode !== "boolean"){
+      block.limitMode = false;
+    }
+
+    if(typeof block.copyAmountMode !== "boolean"){
+      block.copyAmountMode = false;
+    }
 
     if(!Array.isArray(block.marks)){
-      block.marks = newMarks(block.numbers.length);
+      block.marks = block.numbers.map(function(){
+        return [null,null,null,null,null,null];
+      });
+
+      if(Array.isArray(block.days)){
+        block.days.forEach(function(used, dayIndex){
+          if(used){
+            block.marks.forEach(function(row){
+              row[dayIndex] = todayMark();
+            });
+          }
+        });
+      }
     }
 
     while(block.marks.length < block.numbers.length){
       block.marks.push([null,null,null,null,null,null]);
     }
 
-    block.marks = block.marks.slice(0, block.numbers.length).map(function(row){
-      if(!Array.isArray(row)) row = [];
-      var fixed = [];
-      for(var i=0;i<6;i++) fixed.push(normalizeMark(row[i]));
-      return fixed;
+    block.marks = block.marks.slice(0, block.numbers.length);
+
+    block.marks.forEach(function(row, rowIndex){
+      if(!Array.isArray(row)){
+        block.marks[rowIndex] = [null,null,null,null,null,null];
+        return;
+      }
+
+      while(row.length < 6){
+        row.push(null);
+      }
+
+      block.marks[rowIndex] = row.slice(0,6);
     });
+
+    if(!block.id){
+      block.id = newId();
+    }
   }
 
-  function getUsedCount(block){
+  data.blocks.forEach(normalizeBlock);
+
+  function toast(message){
+    var element = byId("toast");
+    element.textContent = message;
+    element.classList.remove("hidden");
+
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(function(){
+      element.classList.add("hidden");
+    },1800);
+  }
+
+  function getUsedMarks(block){
     var count = 0;
+
     block.marks.forEach(function(row){
       row.forEach(function(mark){
         if(mark) count++;
       });
     });
+
     return count;
+  }
+
+  function blockProgress(block){
+    var maximum = block.numbers.length * 6;
+    var used = getUsedMarks(block);
+    var percent = maximum ? Math.round((used / maximum) * 100) : 0;
+    var averageDays = block.numbers.length ? used / block.numbers.length : 0;
+    var color = "";
+
+    if(averageDays > 0 && averageDays <= 3){
+      color = "green";
+    }else if(averageDays > 3 && averageDays < 6){
+      color = "yellow";
+    }else if(averageDays >= 6){
+      color = "red";
+    }
+
+    return {
+      percent:percent,
+      color:color
+    };
   }
 
   function latestDate(block){
     var latest = null;
+
     block.marks.forEach(function(row){
       row.forEach(function(mark){
         if(mark && mark.full && (!latest || mark.full > latest.full)){
@@ -748,7 +962,8 @@ try {
         }
       });
     });
-    return latest ? latest.day + " তারিখ" : "";
+
+    return latest ? latest.day+" তারিখ" : "";
   }
 
   function dayState(block, dayIndex){
@@ -758,112 +973,135 @@ try {
     block.marks.forEach(function(row){
       if(row[dayIndex]){
         marked++;
-        dateText = row[dayIndex].day || "";
+        dateText = row[dayIndex].day;
       }
     });
 
-    if(marked === 0) return {className:"", date:""};
-    if(marked === block.numbers.length) return {className:"used", date:dateText};
-    return {className:"partial", date:dateText};
-  }
+    if(marked === 0){
+      return {className:"",date:""};
+    }
 
-  function blockProgress(block){
-    var totalSlots = block.numbers.length * 6;
-    var used = getUsedCount(block);
-    var percent = totalSlots ? Math.round((used / totalSlots) * 100) : 0;
-    var color = "white";
+    if(marked === block.numbers.length){
+      return {className:"used",date:dateText};
+    }
 
-    if(percent > 0 && percent < 50) color = "green";
-    else if(percent >= 50 && percent < 84) color = "yellow";
-    else if(percent >= 84) color = "red";
-
-    return {percent:percent, color:color};
+    return {className:"partial",date:dateText};
   }
 
   function render(){
-    data = cleanData(data);
-
     var container = byId("blocks");
-    if(!container) return;
     container.innerHTML = "";
 
     var totalNumbers = 0;
     var totalUsedMarks = 0;
 
-    data.blocks.forEach(function(block, index){
-      var progress = blockProgress(block);
-      totalNumbers += block.numbers.length;
-      totalUsedMarks += getUsedCount(block);
+    data.blocks.forEach(function(block,index){
+      normalizeBlock(block);
 
-      var numbersHtml = block.numbers.map(function(number, numberIndex){
+      totalNumbers += block.numbers.length;
+      totalUsedMarks += getUsedMarks(block);
+
+      var progress = blockProgress(block);
+
+      var numbersHtml = block.numbers.map(function(number,numberIndex){
         var usedForNumber = block.marks[numberIndex].filter(Boolean).length;
         var miniButtons = "";
 
         if(block.limitMode){
-          miniButtons = '<div class="number-limits">' +
-            block.marks[numberIndex].map(function(mark, dayIndex){
-              return '<button type="button" class="mini-day ' + (mark ? "used" : "") + '" ' +
-                'data-action="number-day" data-id="' + block.id + '" ' +
-                'data-number="' + numberIndex + '" data-day="' + dayIndex + '">' +
-                (dayIndex + 1) +
-              '</button>';
-            }).join("") +
-          '</div>';
+          miniButtons =
+            '<div class="number-limits">'+
+              block.marks[numberIndex].map(function(mark,dayIndex){
+                return (
+                  '<button type="button" '+
+                    'class="mini-day '+(mark ? "used" : "")+'" '+
+                    'data-action="number-day" '+
+                    'data-id="'+block.id+'" '+
+                    'data-number="'+numberIndex+'" '+
+                    'data-day="'+dayIndex+'">'+
+                    (dayIndex+1)+
+                    (mark ? '<small>'+mark.day+'</small>' : '')+
+                  '</button>'
+                );
+              }).join("")+
+            '</div>';
         }
 
-        return '<div class="number-row">' +
-          '<div class="number-main">' +
-            '<div class="phone">' + number + '</div>' +
-            (block.limitMode
-              ? miniButtons
-              : '<div class="number-used">' + usedForNumber + '/6</div>') +
-          '</div>' +
-        '</div>';
+        return (
+          '<div class="number-row">'+
+            '<div class="number-main">'+
+              '<div class="phone">'+number+'</div>'+
+              '<div class="number-used">'+usedForNumber+'/6</div>'+
+            '</div>'+
+            miniButtons+
+          '</div>'
+        );
       }).join("");
 
       var dayButtons = "";
-      for(var d=0; d<6; d++){
-        var state = dayState(block, d);
-        dayButtons += '<button type="button" class="day ' + state.className + '" ' +
-          'data-action="block-day" data-id="' + block.id + '" data-day="' + d + '">' +
-          (d + 1) +
-          (state.date ? '<small>' + state.date + '</small>' : '') +
-        '</button>';
+
+      for(var dayIndex=0; dayIndex<6; dayIndex++){
+        var state = dayState(block,dayIndex);
+
+        dayButtons += (
+          '<button type="button" '+
+            'class="day '+state.className+'" '+
+            'data-action="block-day" '+
+            'data-id="'+block.id+'" '+
+            'data-day="'+dayIndex+'">'+
+            (dayIndex+1)+
+            (state.date ? '<small>'+state.date+'</small>' : '')+
+          '</button>'
+        );
       }
 
-      var div = document.createElement("div");
-      div.className = "block";
-      div.innerHTML =
-        '<div class="block-top">' +
-          '<div class="block-name">' +
-            '<span class="block-progress-circle ' + progress.color + '">' +
-              '<span class="serial">' + (index + 1) + '</span>' +
-              '<span class="percent">' + progress.percent + '%</span>' +
-            '</span>' +
-            '<span class="block-date">' + latestDate(block) + '</span>' +
-          '</div>' +
-          '<div class="actions">' +
-            '<button type="button" class="action-btn ' +
-              (block.limitMode ? 'limit-active' : '') +
-              '" data-action="limit" data-id="' + block.id + '">Limit</button>' +
-            '<button type="button" class="action-btn" data-action="copy" data-id="' +
-              block.id + '">Copy</button>' +
-            '<button type="button" class="action-btn delete" data-action="delete" data-id="' +
-              block.id + '">Delete</button>' +
-          '</div>' +
-        '</div>' +
-        '<div class="numbers">' + numbersHtml + '</div>' +
-        '<div class="days">' + dayButtons + '</div>';
+      var blockElement = document.createElement("section");
+      blockElement.className = "block";
 
-      container.appendChild(div);
+      blockElement.innerHTML =
+        '<div class="block-top">'+
+          '<div class="block-head-left">'+
+            '<div class="block-circle '+progress.color+'">'+
+              '<span class="serial">'+(index+1)+'</span>'+
+              '<span class="percent">'+progress.percent+'%</span>'+
+            '</div>'+
+            '<span class="block-date">'+latestDate(block)+'</span>'+
+          '</div>'+
+          '<div class="actions">'+
+            '<button type="button" class="action-btn '+(block.copyAmountMode ? "amount-active" : "")+'" data-action="copy-amount" data-id="'+block.id+'">50</button>'+
+            '<button type="button" class="action-btn '+(block.limitMode ? "active" : "")+'" data-action="limit" data-id="'+block.id+'">Limit</button>'+
+            '<button type="button" class="action-btn" data-action="copy" data-id="'+block.id+'">Copy</button>'+
+            '<button type="button" class="action-btn edit" data-action="edit" data-id="'+block.id+'">Edit</button>'+
+            '<button type="button" class="action-btn delete" data-action="delete" data-id="'+block.id+'">Delete</button>'+
+          '</div>'+
+        '</div>'+
+        '<div class="numbers">'+numbersHtml+'</div>'+
+        '<div class="days">'+dayButtons+'</div>';
+
+      container.appendChild(blockElement);
     });
 
     var totalLimit = totalNumbers * PER_NUMBER_LIMIT;
-    var remaining = Math.max(totalLimit - (totalUsedMarks * DAILY_AMOUNT), 0);
+    var usedAmount = totalUsedMarks * DAILY_AMOUNT;
+    var remaining = Math.max(totalLimit - usedAmount,0);
+    var remainingPercent = totalLimit ? Math.round((remaining / totalLimit) * 100) : 100;
 
-    byId("totalNumbers").textContent = totalNumbers;
-    byId("totalLimit").textContent = "৳" + money(totalLimit);
-    byId("remainingLimit").textContent = "৳" + money(remaining);
+    byId("totalLimitLabel").textContent = "নাম্বার "+totalNumbers+" টি ➤ লিমিট";
+    byId("totalLimit").textContent = "৳"+formatMoney(totalLimit);
+    byId("remainingLimit").textContent = "৳"+formatMoney(remaining);
+    byId("usedPercent").textContent = remainingPercent+"%";
+
+    var donut = byId("usedDonut");
+    donut.style.setProperty("--used",(remainingPercent*3.6)+"deg");
+    donut.classList.remove("green","yellow","red");
+
+    if(remainingPercent > 50){
+      donut.classList.add("green");
+    }else if(remainingPercent > 20){
+      donut.classList.add("yellow");
+    }else{
+      donut.classList.add("red");
+    }
+
     byId("empty").style.display = data.blocks.length ? "none" : "block";
   }
 
@@ -871,29 +1109,40 @@ try {
     byId("countStep").classList.remove("hidden");
     byId("numberForm").classList.add("hidden");
     byId("inputs").innerHTML = "";
+    byId("blockCount").value = "4";
+    byId("editingBlockId").value = "";
     byId("modal").classList.remove("hidden");
   }
 
   function closeModal(){
     byId("modal").classList.add("hidden");
     byId("inputs").innerHTML = "";
+    byId("editingBlockId").value = "";
+    byId("numberForm").reset();
   }
 
   function makeInputs(){
-    var count = parseInt(byId("blockCount").value, 10);
-    if(isNaN(count) || count < 1) count = 1;
-    if(count > 50) count = 50;
+    var count = parseInt(byId("blockCount").value,10);
+
+    if(!Number.isFinite(count) || count < 1){
+      toast("কয়টি নাম্বার দিবেন লিখুন");
+      return;
+    }
+
+    count = Math.min(count,50);
+    byId("blockCount").value = String(count);
 
     var wrap = byId("inputs");
     wrap.innerHTML = "";
 
-    for(var i=1; i<=count; i++){
+    for(var index=1; index<=count; index++){
       var row = document.createElement("div");
       row.className = "input-line";
       row.innerHTML =
-        '<div class="idx">' + i + '</div>' +
-        '<input class="input phone-input" type="tel" inputmode="numeric" ' +
-        'maxlength="11" placeholder="01XXXXXXXXX" required>';
+        '<div class="idx">'+index+'</div>'+
+        '<input class="input phone-input" '+
+          'type="tel" inputmode="numeric" maxlength="11" '+
+          'autocomplete="off" placeholder="01XXXXXXXXX" required>';
       wrap.appendChild(row);
     }
 
@@ -903,121 +1152,263 @@ try {
     setTimeout(function(){
       var first = document.querySelector(".phone-input");
       if(first) first.focus();
-    }, 40);
+    },50);
   }
 
-  function toggleMark(block, numberIndex, dayIndex){
+
+  function openEditModal(block){
+    normalizeBlock(block);
+
+    byId("editingBlockId").value = block.id;
+    byId("countStep").classList.add("hidden");
+    byId("numberForm").classList.remove("hidden");
+    byId("inputs").innerHTML = "";
+
+    block.numbers.forEach(function(number,index){
+      var row = document.createElement("div");
+      row.className = "input-line";
+      row.innerHTML =
+        '<div class="idx">'+(index+1)+'</div>'+
+        '<input class="input phone-input" '+
+          'type="tel" inputmode="numeric" maxlength="11" '+
+          'autocomplete="off" value="'+number+'" required>';
+      byId("inputs").appendChild(row);
+    });
+
+    byId("modal").classList.remove("hidden");
+
+    setTimeout(function(){
+      var first = document.querySelector(".phone-input");
+      if(first) first.focus();
+    },50);
+  }
+
+  function toggleOne(block,numberIndex,dayIndex){
     block.marks[numberIndex][dayIndex] =
-      block.marks[numberIndex][dayIndex] ? null : todayInfo();
+      block.marks[numberIndex][dayIndex] ? null : todayMark();
   }
 
-  function toggleWholeDay(block, dayIndex){
+  function toggleWholeDay(block,dayIndex){
     var allMarked = block.marks.every(function(row){
-      return !!row[dayIndex];
+      return Boolean(row[dayIndex]);
     });
 
     block.marks.forEach(function(row){
-      row[dayIndex] = allMarked ? null : todayInfo();
+      row[dayIndex] = allMarked ? null : todayMark();
     });
   }
 
-  function fallbackCopy(text){
-    var ta = document.createElement("textarea");
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand("copy");
-    ta.remove();
-    toast("সব নাম্বার কপি হয়েছে");
+  function copyFallback(text,message){
+    var textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    try{
+      document.execCommand("copy");
+      toast(message);
+    }catch(error){
+      toast("Copy করা যায়নি");
+    }
+
+    textarea.remove();
   }
 
-  byId("addBlockBtn").addEventListener("click", openModal);
-  byId("closeModal").addEventListener("click", closeModal);
-  byId("makeInputsBtn").addEventListener("click", makeInputs);
+  function copyText(text,message){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text)
+        .then(function(){
+          toast(message);
+        })
+        .catch(function(){
+          copyFallback(text,message);
+        });
+    }else{
+      copyFallback(text,message);
+    }
+  }
 
-  byId("modal").addEventListener("click", function(event){
-    if(event.target === byId("modal")) closeModal();
+  byId("addBlockBtn").addEventListener("click",openModal);
+  byId("closeModal").addEventListener("click",closeModal);
+  byId("makeInputsBtn").addEventListener("click",makeInputs);
+
+  byId("backBtn").addEventListener("click",function(){
+    byId("numberForm").classList.add("hidden");
+    byId("countStep").classList.remove("hidden");
+    byId("inputs").innerHTML = "";
   });
 
-  byId("numberForm").addEventListener("submit", function(event){
+  byId("modal").addEventListener("click",function(event){
+    if(event.target === byId("modal")){
+      closeModal();
+    }
+  });
+
+  byId("numberForm").addEventListener("submit",function(event){
     event.preventDefault();
 
-    var inputs = Array.prototype.slice.call(
-      document.querySelectorAll(".phone-input")
+    var inputElements = Array.prototype.slice.call(
+      document.querySelectorAll("#inputs .phone-input")
     );
 
-    var numbers = inputs.map(function(input){
-      return input.value.replace(/\D/g, "");
-    });
-
-    if(numbers.length === 0 ||
-       numbers.some(function(n){ return !/^01\d{9}$/.test(n); })){
-      toast("সঠিক ১১ ডিজিটের নাম্বার দিন");
+    if(inputElements.length === 0){
+      toast("আগে Next চাপুন");
       return;
     }
 
-    data.blocks.push({
-      id: String(Date.now()) + Math.random().toString(16).slice(2),
-      numbers: numbers,
-      limitMode: false,
-      marks: newMarks(numbers.length)
+    var numbers = inputElements.map(function(input){
+      return normalizePhone(input.value);
     });
 
+    var emptyIndex = numbers.findIndex(function(number){
+      return number.length === 0;
+    });
+
+    if(emptyIndex !== -1){
+      inputElements[emptyIndex].focus();
+      toast((emptyIndex+1)+" নম্বর ইনপুট খালি");
+      return;
+    }
+
+    var invalidIndex = numbers.findIndex(function(number){
+      return !validPhone(number);
+    });
+
+    if(invalidIndex !== -1){
+      inputElements[invalidIndex].focus();
+      toast((invalidIndex+1)+" নম্বরটি সঠিক নয়");
+      return;
+    }
+
+    var unique = new Set(numbers);
+
+    if(unique.size !== numbers.length){
+      toast("একই ব্লকে ডুপ্লিকেট নাম্বার আছে");
+      return;
+    }
+
+    var editingId = byId("editingBlockId").value;
+
+    if(editingId){
+      var editingBlock = data.blocks.find(function(item){
+        return item.id === editingId;
+      });
+
+      if(!editingBlock){
+        toast("Edit block পাওয়া যায়নি");
+        return;
+      }
+
+      var oldMarks = editingBlock.marks || [];
+
+      editingBlock.numbers = numbers;
+      editingBlock.marks = numbers.map(function(number,index){
+        if(oldMarks[index] && Array.isArray(oldMarks[index])){
+          return oldMarks[index].slice(0,6);
+        }
+        return [null,null,null,null,null,null];
+      });
+
+      normalizeBlock(editingBlock);
+      toast("Block update হয়েছে");
+    }else{
+      data.blocks.push({
+        id:newId(),
+        numbers:numbers,
+        limitMode:false,
+        copyAmountMode:false,
+        marks:numbers.map(function(){
+          return [null,null,null,null,null,null];
+        })
+      });
+
+      toast("নাম্বার সেভ হয়েছে");
+    }
+
+    saveData();
+    render();
     closeModal();
-    saveData(true);
   });
 
-  byId("blocks").addEventListener("click", function(event){
-    var btn = event.target.closest("button[data-action]");
-    if(!btn) return;
+  byId("blocks").addEventListener("click",function(event){
+    var button = event.target.closest("button[data-action]");
+    if(!button) return;
 
     var block = data.blocks.find(function(item){
-      return item.id === btn.dataset.id;
+      return item.id === button.dataset.id;
     });
+
     if(!block) return;
 
-    var action = btn.dataset.action;
+    var action = button.dataset.action;
+
+    if(action === "copy-amount"){
+      block.copyAmountMode = !block.copyAmountMode;
+      saveData();
+      render();
+      return;
+    }
 
     if(action === "limit"){
       block.limitMode = !block.limitMode;
-      saveData(false);
+      saveData();
+      render();
       return;
     }
 
     if(action === "block-day"){
-      toggleWholeDay(block, parseInt(btn.dataset.day, 10));
-      saveData(false);
+      toggleWholeDay(block,parseInt(button.dataset.day,10));
+      saveData();
+      render();
       return;
     }
 
     if(action === "number-day"){
-      toggleMark(
+      toggleOne(
         block,
-        parseInt(btn.dataset.number, 10),
-        parseInt(btn.dataset.day, 10)
+        parseInt(button.dataset.number,10),
+        parseInt(button.dataset.day,10)
       );
-      saveData(false);
+      saveData();
+      render();
       return;
     }
 
     if(action === "copy"){
-      var text = block.numbers.join("\n");
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(text)
-          .then(function(){ toast("সব নাম্বার কপি হয়েছে"); })
-          .catch(function(){ fallbackCopy(text); });
+      var text;
+
+      if(block.copyAmountMode){
+        text = block.numbers.map(function(number){
+          return number+" ✅\n50000";
+        }).join("\n\n");
+
+        copyText(text,"নাম্বার ও 50000 কপি হয়েছে");
       }else{
-        fallbackCopy(text);
+        text = block.numbers.join("\n");
+        copyText(text,"সব নাম্বার কপি হয়েছে");
       }
+
+      return;
+    }
+
+    if(action === "edit"){
+      openEditModal(block);
       return;
     }
 
     if(action === "delete"){
-      if(confirm("এই ব্লক ডিলিট করবেন?")){
+      var confirmed = confirm("এই ব্লক ডিলিট করবেন?");
+
+      if(confirmed){
         data.blocks = data.blocks.filter(function(item){
           return item.id !== block.id;
         });
-        saveData(false);
+
+        saveData();
+        render();
       }
     }
   });
@@ -1029,37 +1420,39 @@ try {
       "value",
       function(snapshot){
         cloudReady = true;
-        var raw = snapshot.val();
+        var cloudValue = snapshot.val();
 
-        if(typeof raw === "string" && raw){
+        if(typeof cloudValue === "string" && cloudValue){
           try{
-            suppressCloudWrite = true;
-            data = cleanData(JSON.parse(raw));
-            saveLocalData();
-            render();
+            var parsed = JSON.parse(cloudValue);
+            if(parsed && Array.isArray(parsed.blocks)){
+              applyingCloudData = true;
+              data = parsed;
+              data.blocks.forEach(normalizeBlock);
+              saveLocalData();
+              render();
+            }
           }catch(error){
-            console.error("Cloud JSON parse failed:", error);
+            console.error("Cloud data parse failed:", error);
             toast("Cloud data পড়া যায়নি");
           }finally{
-            suppressCloudWrite = false;
+            applyingCloudData = false;
           }
         }else{
-          window.firebaseDB.ref(FIREBASE_PATH)
-            .set(JSON.stringify(data))
+          window.firebaseDB.ref(FIREBASE_PATH).set(JSON.stringify(data))
             .catch(function(error){
-              console.error("First cloud save failed:", error);
+              console.error("Initial Firebase save failed:", error);
             });
         }
       },
       function(error){
         cloudReady = false;
         console.error("Firebase read failed:", error);
-        toast("Offline mode");
+        toast("Offline mode: ফোনে save হবে");
       }
     );
   }else{
-    cloudReady = false;
-    console.error("Firebase SDK unavailable:", window.firebaseInitError);
+    console.error("Firebase unavailable:", window.firebaseInitError);
   }
 })();
 </script>
